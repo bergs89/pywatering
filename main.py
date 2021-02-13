@@ -1,18 +1,27 @@
-from sensors import humidity_sensor, relay
+import sys
+import time
 
-from time import time
 from gpiozero import Button
+from sensors import photo_resistor, relay
 
-
-button = Button(button_port)
-
+def loop_relays(relay):
+    relay_channels = [4, 27, 22, 23]
+    for relay_channel in relay_channels:
+        # create a relay object.
+        # Triggered by the output pin going low: active_high=False.
+        # Initially off: initial_value=False
+        try:
+            relay.main_loop(relay.relay(relay_channel))
+        except KeyboardInterrupt:
+            # turn the relay off
+            relay.set_relay(False)
+            print("\nExiting application\n")
+            # exit the application
+            sys.exit(0)
 
 while True:
-    ports = [(1,1), (2,2), (3,3), (4,4)]
-    for port in ports:
-        relay_port, sensor_port = port
-        if humidity_sensor.get_humidity(sensor_port) < 0.1:
-            relay.activate_relay(relay_port)
-            time.sleep(1)
-    button.wait_for_press(timeout=300)
-    relay.activate_relays_in_sequence(relay_ports)
+    normalized_light = photo_resistor.get_light(13, 26)
+    if normalized_light < 0.1 or Button(12).wait_for_press(timeout = 600):
+        loop_relays(relay)
+    else:
+        continue

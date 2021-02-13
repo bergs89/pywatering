@@ -27,23 +27,19 @@ def get_light(middle_pin, positive_pin):
         while (GPIO.input(middle_pin) == GPIO.LOW) and timeout < 0.5555:
             end_time = time.time()
             timeout = end_time - start_time
-        measure_resistance = end_time - start_time
-        resistance_estimation = (measure_resistance / capacitor * 1000000) * constant
         i = i + 1
-    return resistance_estimation
-
-
-def normalize_light(resistance):
-    min_value = 0
-    max_value = 1000000
-    normalized_light = 1 - (resistance - min_value) / max_value
-    return pow(normalized_light,1)
+    measure_resistance = end_time - start_time
+    resistance_estimation = (measure_resistance / capacitor * 1000000) * constant
+    calibration_min_value = 0
+    calibration_max_value = 1000000
+    normalized_light = 1 - (resistance_estimation - calibration_min_value) / calibration_max_value
+    normalized_light = round(pow(normalized_light, 1), 2)
+    print(r"Light (from 0 to 1): " + str(normalized_light))
+    return normalized_light
 
 
 if __name__ == '__main__':
     while True:
-        resistance_est = get_light(13, 26)
-        normalized_light = normalize_light(resistance_est)
+        normalized_light = get_light(13, 26)
 	print(normalized_light)
-	print(resistance_est)
 	time.sleep(0.5)
