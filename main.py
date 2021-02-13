@@ -1,5 +1,4 @@
-import humidity_sensor
-import relay
+from sensors import humidity_sensor, relay
 
 from time import time
 from gpiozero import Button
