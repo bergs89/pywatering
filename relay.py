@@ -10,16 +10,8 @@ import time
 
 import gpiozero
 
-# change this value based on which GPIO port the relay is connected to
-RELAY_PIN = 18
 
-# create a relay object.
-# Triggered by the output pin going low: active_high=False.
-# Initially off: initial_value=False
-relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
-
-
-def set_relay(status):
+def set_relay(status, relay):
     if status:
         print("Setting relay: ON")
         relay.on()
@@ -28,27 +20,36 @@ def set_relay(status):
         relay.off()
 
 
-def toggle_relay():
+def toggle_relay(relay):
     print("toggling relay")
     relay.toggle()
 
 
-def main_loop():
+def main_loop(relay):
     # start by turning the relay off
-    set_relay(False)
-    while 1:
+    set_relay(False, relay)
+    start_time = time.time()
+    end_time = 0
+    while end_time < 4.5:
         # then toggle the relay every second until the app closes
-        toggle_relay()
+        toggle_relay(relay)
         # wait a second 
         time.sleep(1)
+        end_time = start_time - time.time()
 
 
 if __name__ == "__main__":
-    try:
-        main_loop()
-    except KeyboardInterrupt:
-        # turn the relay off
-        set_relay(False)
-        print("\nExiting application\n")
-        # exit the application
-        sys.exit(0)
+    relay_channels = [4, 22, 23, 27]
+    for relay_channel in relay_channels:
+        # create a relay object.
+        # Triggered by the output pin going low: active_high=False.
+        # Initially off: initial_value=False
+        relay = gpiozero.OutputDevice(relay_channel, active_high=False, initial_value=False)
+        try:
+            main_loop(relay)
+        except KeyboardInterrupt:
+            # turn the relay off
+            set_relay(False)
+            print("\nExiting application\n")
+            # exit the application
+            sys.exit(0)
