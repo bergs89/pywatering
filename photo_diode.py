@@ -39,7 +39,8 @@ def normalize_light(resistance):
 
 
 if __name__ == '__main__':
-    resistance = get_light(13, 26)
-    normalized_light = normalize_light(resistance)
-    print(resistance)
-    print(normalized_light)
+    while True:
+        resistance = get_light(13, 26)
+        normalized_light = normalize_light(resistance)
+        print(resistance)
+        print(normalized_light)
