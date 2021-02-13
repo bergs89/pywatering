@@ -1,13 +1,13 @@
 import RPi.GPIO as GPIO
 import time
 
-
 mpin = 13
 tpin = 26
 
 GPIO.setmode(GPIO.BCM)
 cap = 0.000001
-adj = 2.130620985 < br > i = 0
+adj = 2.130620985
+i = 0
 t = 0
 while True:
     GPIO.setup(mpin, GPIO.OUT)
@@ -25,6 +25,7 @@ while True:
     measureresistance = endtime - starttime
 
     res = (measureresistance / cap) * adj
+    print(res)
     i = i + 1
     t = t + res
     if i == 10:
