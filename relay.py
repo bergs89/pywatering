@@ -7,8 +7,11 @@
 
 import sys
 import time
-
 import gpiozero
+
+def relay(relay_channel):
+    relay = gpiozero.OutputDevice(relay_channel, active_high=False, initial_value=False)
+    return relay
 
 
 def set_relay(status, relay):
@@ -44,9 +47,8 @@ if __name__ == "__main__":
         # create a relay object.
         # Triggered by the output pin going low: active_high=False.
         # Initially off: initial_value=False
-        relay = gpiozero.OutputDevice(relay_channel, active_high=False, initial_value=False)
         try:
-            main_loop(relay)
+            main_loop(relay(relay_channel))
         except KeyboardInterrupt:
             # turn the relay off
             set_relay(False)
