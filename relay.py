@@ -33,13 +33,10 @@ def main_loop(relay):
     set_relay(False, relay)
     start_time = time.time()
     end_time = 0
-    while end_time < 3:
-        time.sleep(0.5)
-# then toggle the relay every second until the app closes
-        toggle_relay(relay)
-        # wait a second 
-        time.sleep(0.5)
-        end_time = time.time() - start_time
+    time.sleep(0.5)
+    toggle_relay(relay)
+    time.sleep(0.5)
+    end_time = time.time() - start_time
 
 
 if __name__ == "__main__":

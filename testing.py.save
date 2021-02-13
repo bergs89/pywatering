@@ -2,17 +2,20 @@ import photo_diode, relay
 import sys
 import time
 
-from gpiozero import Button
-
-button = Button(12)
-
 while True:
-    photo_diode.get_light(13, 26)
-    time.sleep(1)
-    resistance = photo_diode.get_light(13, 26)
-    normalized_light = photo_diode.normalize_light(resistance)
-    print(r"Light (from 0 to 1): "+str(round(normalized_light,2)))
-    if normalized_light < 0.1 or button.wait_for_press(timeout = 600):
+    error = 1
+    normalized_light_i = 0
+    normalized_light_ii = 0
+    i = 0
+    while error > 0.02 or i < 20:
+
+        normalized_light_i = resistance = photo_diode.get_light(13, 26)
+        time.sleep(0.25)
+        normalized_light = photo_diode.normalize_light(resistance)
+        error = abs(normalized_light_i - normalized_light_ii)
+        print(normalized_light)
+        i = i + 1
+    if normalized_light > 0.6:
         relay_channels = [4, 27, 22, 23]
         for relay_channel in relay_channels:
             # create a relay object.
@@ -26,5 +29,3 @@ while True:
                 print("\nExiting application\n")
                 # exit the application
                 sys.exit(0)
-    else:
-        continue
