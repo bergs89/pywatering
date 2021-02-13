@@ -33,7 +33,7 @@ def normalize_light(resistance):
     min_value = 0.0005
     max_value = 0.15
     normalized_light = 1 - (resistance - min_value) / max_value
-    return normalized_light
+    return pow(normalized_light,3)
 
 
 if __name__ == '__main__':
