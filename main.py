@@ -21,7 +21,9 @@ def loop_relays(relay):
 
 while True:
     normalized_light = photo_resistor.get_light(13, 26)
-    if normalized_light < 0.1 or Button(12).wait_for_press(timeout = 600):
+    if normalized_light < 0.1:
+        loop_relays(relay)
+    elif Button(12).is_pressed():
         loop_relays(relay)
     else:
         continue
