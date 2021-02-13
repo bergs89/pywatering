@@ -1,11 +1,11 @@
-from sensors import photo_diode, relay
+import photo_diode, relay
 import sys
 
 while True:
     resistance = photo_diode.get_light(13, 26)
     normalized_light = photo_diode.normalize_light(resistance)
-    if normalized_light > 0.7:
-        relay_channels = [4, 22, 23, 27]
+    if normalized_light > 0.9:
+        relay_channels = [4, 27, 22, 23]
         for relay_channel in relay_channels:
             # create a relay object.
             # Triggered by the output pin going low: active_high=False.
