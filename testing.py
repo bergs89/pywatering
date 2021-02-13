@@ -3,6 +3,7 @@ import sys
 
 while True:
     resistance = photo_diode.get_light(13, 26)
+    resistance = photo_diode.get_light(13, 26)
     normalized_light = photo_diode.normalize_light(resistance)
     if normalized_light > 0.9:
         relay_channels = [4, 27, 22, 23]
