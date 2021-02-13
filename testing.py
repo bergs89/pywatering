@@ -3,7 +3,7 @@ import sys
 import time
 
 while True:
-    resistance = photo_diode.get_light(13, 26)
+    photo_diode.get_light(13, 26)
     time.sleep(1)
     resistance = photo_diode.get_light(13, 26)
     normalized_light = photo_diode.normalize_light(resistance)
@@ -21,5 +21,5 @@ while True:
                 print("\nExiting application\n")
                 # exit the application
                 sys.exit(0)
-    elif:
+    else:
         continue
