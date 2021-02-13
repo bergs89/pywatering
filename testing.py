@@ -4,14 +4,16 @@ import time
 
 while True:
     error = 1
-    resistance_ii = 0
-    resistance_i = 0
-    while error > 0.075:
-        resistance_i = resistance = photo_diode.get_light(13, 26)
-        time.sleep(0.25)
-        error = abs(resistance_i - resistance_ii)
-    normalized_light = photo_diode.normalize_light(resistance)
-    print(normalized_light)
+    normalized_light_i = 0
+    normalized_light_ii = 0
+    i = 0
+    while error > 0.075 and i > 3:
+        normalized_light_i = resistance = photo_diode.get_light(13, 26)
+        time.sleep(0.05)
+        normalized_light = photo_diode.normalize_light(resistance)
+        error = abs(normalized_light_i - normalized_light_ii)
+        print(normalized_light)
+        i = i + 1
     if normalized_light > 0.9:
         relay_channels = [4, 27, 22, 23]
         for relay_channel in relay_channels:
