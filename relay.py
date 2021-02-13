@@ -43,9 +43,9 @@ def testing_loop(relay_pin):
 
 
 if __name__ == "__main__":
-    relay_pin = 18
+    relay_pin = 4
     try:
-        testing_loop()
+        testing_loop(relay_pin)
     except KeyboardInterrupt:
         # turn the relay off
         set_relay(False, relay_pin)
@@ -55,5 +55,8 @@ if __name__ == "__main__":
 
 
 
+relay_channels = [4, 22, 23, 27]
+for channel in relay_channels:
+    set_relay(True, channel)
 
 
