@@ -1,9 +1,15 @@
 import photo_diode, relay
 import sys
+import time
 
 while True:
-    resistance = photo_diode.get_light(13, 26)
-    resistance = photo_diode.get_light(13, 26)
+    error = 1
+    resistance_ii = 0
+    resistance_i = 0
+    while error > 0.075:
+        resistance_i = resistance = photo_diode.get_light(13, 26)
+        time.sleep(0.25)
+        error = abs(resistance_i - resistance_ii)
     normalized_light = photo_diode.normalize_light(resistance)
     print(normalized_light)
     if normalized_light > 0.9:
