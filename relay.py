@@ -1,11 +1,25 @@
+#!/usr/bin/python
+
+# A simple Python application for controlling a relay board from a Raspberry Pi
+# The application uses the GPIO Zero library (https://gpiozero.readthedocs.io/en/stable/)
+# The relay is connected to one of the Pi's GPIO ports, then is defined as an Output device
+# in GPIO Zero: https://gpiozero.readthedocs.io/en/stable/api_output.html#outputdevice
+
 import sys
 import time
 
 import gpiozero
 
+# change this value based on which GPIO port the relay is connected to
+RELAY_PIN = 18
 
-def set_relay(status, relay_pin):
-    relay = gpiozero.OutputDevice(relay_pin, active_high=False, initial_value=False)
+# create a relay object.
+# Triggered by the output pin going low: active_high=False.
+# Initially off: initial_value=False
+relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
+
+
+def set_relay(status):
     if status:
         print("Setting relay: ON")
         relay.on()
@@ -14,49 +28,27 @@ def set_relay(status, relay_pin):
         relay.off()
 
 
-def toggle_relay(relay_pin):
-    relay = gpiozero.OutputDevice(relay_pin, active_high=False, initial_value=False)
+def toggle_relay():
     print("toggling relay")
     relay.toggle()
 
 
-def activate_relay_for_time(port_number, time):
-    set_relay(True, relay_pin)
-    time.sleep(time)
-    toggle_relay(relay_pin)
-    time.sleep(0.25)
-
-
-def activate_relays_in_sequence(relay_ports, time):
-    for relay_port in relay_ports:
-        activate_relay_for_time(relay_port, time)
-
-
-def testing_loop(relay_pin):
+def main_loop():
     # start by turning the relay off
-    set_relay(False, relay_pin)
+    set_relay(False)
     while 1:
         # then toggle the relay every second until the app closes
         toggle_relay()
-        # wait a second
+        # wait a second 
         time.sleep(1)
 
 
 if __name__ == "__main__":
-    relay_pin = 4
     try:
-        testing_loop(relay_pin)
+        main_loop()
     except KeyboardInterrupt:
         # turn the relay off
-        set_relay(False, relay_pin)
+        set_relay(False)
         print("\nExiting application\n")
         # exit the application
         sys.exit(0)
-
-
-
-relay_channels = [4, 22, 23, 27]
-for channel in relay_channels:
-    set_relay(True, channel)
-
-
