@@ -4,6 +4,8 @@ import time
 
 while True:
     resistance = photo_diode.get_light(13, 26)
+    time.sleep(1)
+    resistance = photo_diode.get_light(13, 26)
     normalized_light = photo_diode.normalize_light(resistance)
     if normalized_light > 0.9:
         relay_channels = [4, 27, 22, 23]
@@ -19,3 +21,5 @@ while True:
                 print("\nExiting application\n")
                 # exit the application
                 sys.exit(0)
+    elif:
+        continue
