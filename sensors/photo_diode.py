@@ -31,7 +31,7 @@ def get_light(middle_pin, positive_pin):
 
 def normalize_light(resistance):
     min_value = 0.0005
-    max_value = 0.15
+    max_value = 0.2
     normalized_light = 1 - (resistance - min_value) / max_value
     return pow(normalized_light,3)
 
