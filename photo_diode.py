@@ -40,20 +40,6 @@ def normalize_light(resistance):
     return pow(normalized_light,1)
 
 
-def get_light_corrected(middle_pin, positive_pin):
-    light_i = 0
-    light_ii = 0
-    error = 1
-    while error > 0.075:
-	light_ii = light_i
-	light_i = get_light(middle_pin, positive_pin)
-	light_i = normalize_light(light_i)
-	time.sleep(0.001)
-	error = abs(light_ii - light_i)
-    
-    return light_i
-
-
 if __name__ == '__main__':
     while True:
         resistance_est = get_light(13, 26)
