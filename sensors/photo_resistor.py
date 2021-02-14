@@ -41,5 +41,5 @@ def get_light(middle_pin, positive_pin):
 if __name__ == '__main__':
     while True:
         normalized_light = get_light(13, 26)
-	print(normalized_light)
-	time.sleep(0.5)
+        print(normalized_light)
+        time.sleep(0.5)
