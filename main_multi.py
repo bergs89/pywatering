@@ -2,7 +2,7 @@ import sys
 import time
 
 from gpiozero import Button
-from sensors import photo_resistor, relay
+from sensors import photo_resistor, relay, soil_moisture
 from multiprocessing import Process
 
 
