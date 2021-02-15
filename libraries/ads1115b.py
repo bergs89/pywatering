@@ -58,14 +58,14 @@ GPIO.setup(ALERTPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)  ## read mode, pull up r
 
 
 class ADS1115(cmd.Cmd):
-    intro = '''usage: type following commands
-          1    - one-shot measurement mode, timed
-          2    - one-shot measurement mode, alerted through GPIO
-          3    - continuous measurment mode, alerted through GPIO
-          4  low high  - continuous mode, alerted when value out of range [low, high]
-          q (quit)
-          just hitting enter quits any mode 1-4. Enter 'y' to continue in modes 1 and 2.'''
-    prompt = 'Enter 1,2,3,4 or q >>'
+    # intro = '''usage: type following commands
+    #       1    - one-shot measurement mode, timed
+    #       2    - one-shot measurement mode, alerted through GPIO
+    #       3    - continuous measurment mode, alerted through GPIO
+    #       4  low high  - continuous mode, alerted when value out of range [low, high]
+    #       q (quit)
+    #       just hitting enter quits any mode 1-4. Enter 'y' to continue in modes 1 and 2.'''
+    # prompt = 'Enter 1,2,3,4 or q >>'
     file = None
 
     #    __logfile = None
@@ -114,6 +114,30 @@ class ADS1115(cmd.Cmd):
         values_array = np.array(values)
         return values_array
 
+    def continuous_read_avg(self, timeout):
+        '''One-shot, Read value from channel 0 with wait time'''
+        resetChip()
+        # compare with configuration settings from ADS115 datasheet
+        # start single conversion - AIN2/GND - 4.096V - single shot - 8SPS - X
+        # - X - X - disable comparator
+        conf = prepareLEconf('1-110-001-1-000-0-0-0-11')
+        values = []
+        start_time = time.time()
+        runtime = 0
+        while True and runtime < timeout:
+            BUS.write_word_data(DEVICE_ADDRESS, POINTER_CONFIGURATION, conf)
+            # long enough to be safe that data acquisition (conversion) has completed
+            # may be calculated from data rate + some extra time for safety.
+            # check accuracy in any case.
+            time.sleep(0.2)
+            value_raw = BUS.read_word_data(DEVICE_ADDRESS, POINTER_CONVERSION)
+            value = LEtoBE(value_raw)
+            values.append(value)
+            runtime = time.time() - start_time
+        value_avg = np.array(values).mean()
+        return value_avg
+
+
     def do_q(self, arg):
         '''Quit.'''
         return True
@@ -132,10 +156,10 @@ if __name__ == "__main__":
             level=logging.DEBUG,
             #format='%(name)-12s: %(levelname)-8s %(message)s')
             format='%(message)s')
-        logger = logging.getLogger('ADS1115Runner')
+        logger = logging.getLogger('ADS1115')
         value = ADS1115().single_read(0)
-	values = ADS1115().continuous_read(0.25)
+        values = ADS1115().continuous_read(0.25)
         print(value)
-	print(values)
+        print(values)
     finally:
         ADS1115().shutdown()

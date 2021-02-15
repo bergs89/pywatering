@@ -134,6 +134,7 @@ if __name__ == "__main__":
             #format='%(name)-12s: %(levelname)-8s %(message)s')
             format='%(message)s')
         logger = logging.getLogger('ADS1115Runner')
-        ADS1115().continuos_read(timeout=5)
+        value = ADS1115().single_read()
+        print(value)
     finally:
         ADS1115().shutdown()
