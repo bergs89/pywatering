@@ -1,140 +1,66 @@
-# code is a rework of Guido Lutterbach ADS1115Runner
-# http://smartypies.com/projects/ads1115-with-raspberrypi-and-python/ads1115runner/
+import time
+# import board
+import busio
+import numpy as np
 
-import cmd, time, logging, smbus, RPi.GPIO as GPIO
-
-# ADS1115 + hardware constants
-I2C_BUS = 0
-DEVICE_ADDRESS = 0x4B
-POINTER_CONVERSION = 0x0
-POINTER_CONFIGURATION = 0x1
-POINTER_LOW_THRESHOLD = 0x2
-POINTER_HIGH_THRESHOLD = 0x3
-
-RESET_ADDRESS = 0b0000000
-RESET_COMMAND = 0b00000110
-
-# Open I2C device
-BUS = smbus.SMBus(I2C_BUS)
-BUS.open(I2C_BUS)
-
-ALERTPIN = 27
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 
 
-def swap2Bytes(c):
-    '''Revert Byte order for Words (2 Bytes, 16 Bit).'''
-    return (c >> 8 | c << 8) & 0xFFFF
+def get_analog_voltage(SCL_pin, SDA_pin, a, gain):
+    # Create the I2C bus
+    # i2c = busio.I2C(board.SCL, board.SDA)
+    i2c = busio.I2C(SCL_pin, SDA_pin)
+    # Create the ADS object
+    # ads = ADS.ADS1015(i2c)
+    ads = ADS.ADS1115(i2c)
+    # Create a sinlge ended channel on Pin 0
+    #   Max counts for ADS1015 = 2047
+    #                  ADS1115 = 32767
+    if a == 0:
+        chan = AnalogIn(ads, ADS.P0)
+    elif a == 1:
+        chan = AnalogIn(ads, ADS.P1)
+    elif a == 2:
+        chan = AnalogIn(ads, ADS.P2)
+    elif a == 3:
+        chan = AnalogIn(ads, ADS.P3)
+    else:
+        raise IndexError
+    # The ADS1015 and ADS1115 both have the same gain options.
+    #
+    #       GAIN    RANGE (V)
+    #       ----    ---------
+    #        2/3    +/- 6.144
+    #          1    +/- 4.096
+    #          2    +/- 2.048
+    #          4    +/- 1.024
+    #          8    +/- 0.512
+    #         16    +/- 0.256
+    #
+    # gains = (2 / 3, 1, 2, 4, 8, 16)
+    ads.gain = gain
+    return chan.voltage
 
 
-def prepareLEconf(BEconf):
-    '''Prepare LittleEndian Byte pattern from BigEndian configuration string, with separators.'''
-    c = int(BEconf.replace('-', ''), base=2)
-    return swap2Bytes(c)
+def get_analog_voltage_continuous(SCL_pin, SDA_pin, a, gain, timeout):
+    start_time = time.time()
+    voltages = []
+    runtime = 0
+    while timeout > runtime:
+        this_voltage = get_analog_voltage(SCL_pin, SDA_pin, a, gain)
+        voltages.append(this_voltage)
+        runtime = time.time() - start_time
+    runtime_array = np.array(voltages)
+    return runtime_array.mean(), runtime_array
 
-
-def LEtoBE(c):
-    '''Little Endian to BigEndian conversion for signed 2Byte integers (2 complement).'''
-    c = swap2Bytes(c)
-    if (c >= 2 ** 15):
-        c = c - 2 ** 16
-    return c
-
-
-def BEtoLE(c):
-    '''BigEndian to LittleEndian conversion for signed 2 Byte integers (2 complement).'''
-    if (c < 0):
-        c = 2 ** 16 + c
-    return swap2Bytes(c)
-
-
-def resetChip():
-    BUS.write_byte(RESET_ADDRESS, RESET_COMMAND)
-    return
-
-
-# Use BCM GPIO references
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(ALERTPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)  ## read mode, pull up resistor
-
-
-class ADS1115(cmd.Cmd):
-    intro = '''usage: type following commands
-          1    - one-shot measurement mode, timed
-          2    - one-shot measurement mode, alerted through GPIO
-          3    - continuous measurment mode, alerted through GPIO
-          4  low high  - continuous mode, alerted when value out of range [low, high]
-          q (quit)
-          just hitting enter quits any mode 1-4. Enter 'y' to continue in modes 1 and 2.'''
-    prompt = 'Enter 1,2,3,4 or q >>'
-    file = None
-
-    #    __logfile = None
-
-    def alerted(self, arg):
-        data_raw = BUS.read_word_data(DEVICE_ADDRESS, POINTER_CONVERSION)
-        print('alerted:' + str(LEtoBE(data_raw)))
-        return
-
-    def single_read(self, arg):
-        '''One-shot, Read value from channel 0 with wait time'''
-        resetChip()
-        # compare with configuration settings from ADS115 datasheet
-        # start single conversion - AIN2/GND - 4.096V - single shot - 8SPS - X
-        # - X - X - disable comparator
-        conf = prepareLEconf('1-110-001-1-000-0-0-0-11')
-        BUS.write_word_data(DEVICE_ADDRESS, POINTER_CONFIGURATION, conf)
-        # long enough to be safe that data acquisition (conversion) has completed
-        # may be calculated from data rate + some extra time for safety.
-        # check accuracy in any case.
-        time.sleep(0.2)
-        value_raw = BUS.read_word_data(DEVICE_ADDRESS, POINTER_CONVERSION)
-        value = LEtoBE(value_raw)
-        print(value)
-        return value
-
-    def continuos_read(self, timeout):
-        '''One-shot, Read value from channel 0 with wait time'''
-        resetChip()
-        # compare with configuration settings from ADS115 datasheet
-        # start single conversion - AIN2/GND - 4.096V - single shot - 8SPS - X
-        # - X - X - disable comparator
-        conf = prepareLEconf('1-110-001-1-000-0-0-0-11')
-        values = []
-        start_time = time.time()
-        runtime = 0
-        while True and runtime > timeout:
-            BUS.write_word_data(DEVICE_ADDRESS, POINTER_CONFIGURATION, conf)
-            # long enough to be safe that data acquisition (conversion) has completed
-            # may be calculated from data rate + some extra time for safety.
-            # check accuracy in any case.
-            time.sleep(0.2)
-            value_raw = BUS.read_word_data(DEVICE_ADDRESS, POINTER_CONVERSION)
-            value = LEtoBE(value_raw)
-            values.append(value)
-            runtime = time.time() - start_time
-        print(values)
-        return values
-
-    def do_q(self, arg):
-        '''Quit.'''
-        return True
-
-    def default(self, line):
-        print('undefined key')
-
-    def shutdown(self):
-        GPIO.cleanup()
-        BUS.close()
-        pass
 
 if __name__ == "__main__":
-    try:
-        logging.basicConfig(
-            level=logging.DEBUG,
-            #format='%(name)-12s: %(levelname)-8s %(message)s')
-            format='%(message)s')
-        logger = logging.getLogger('ADS1115Runner')
-        value = ADS1115().single_read()
-        print(value)
-    finally:
-        ADS1115().shutdown()
+    gain = 1
+    SCL_pin = 1
+    SDA_pin = 0
+    while True:
+        for analog_signal in range(4):
+            voltage = get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)
+            print("Voltage on pin: " + str(analog_signal) + " is: " +str(voltage))
+        time.sleep(1)
