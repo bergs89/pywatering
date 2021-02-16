@@ -28,15 +28,12 @@ def toggle_relay(relay):
     relay.toggle()
 
 
-def main_loop(relay):
+def main_loop(relay, opening_time):
     # start by turning the relay off
     set_relay(False, relay)
-    start_time = time.time()
-    end_time = 0
     time.sleep(0.5)
     toggle_relay(relay)
-    time.sleep(3.5)
-    end_time = time.time() - start_time
+    time.sleep(0.5+opening_time)
 
 
 if __name__ == "__main__":
@@ -46,7 +43,7 @@ if __name__ == "__main__":
         # Triggered by the output pin going low: active_high=False.
         # Initially off: initial_value=False
         try:
-            main_loop(relay(relay_channel))
+            main_loop(relay(relay_channel), 1)
         except KeyboardInterrupt:
             # turn the relay off
             set_relay(False)

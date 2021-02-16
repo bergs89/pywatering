@@ -15,9 +15,9 @@ def loop_relays(relay):
         pump_water(relay_channel)
 
 
-def pump_water(relay_channel):
+def pump_water(relay_channel, flow_time):
     try:
-        relay.main_loop(relay.relay(relay_channel))
+        relay.main_loop(relay.relay(relay_channel), flow_time)
     except KeyboardInterrupt:
         # turn the relay off
         relay.set_relay(False)
@@ -33,7 +33,8 @@ def loop_from_soil_sensors():
             soil_wet = soil_moisture.get_moisture(analog_signal)
             if soil_wet == 1:
                 time.sleep(1)
-                pump_water(relay_channels[analog_signal])
+                flow_time = 5
+                pump_water(relay_channels[analog_signal], flow_time)
                 time.sleep(1)
             else:
                 time.sleep(1)
