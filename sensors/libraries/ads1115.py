@@ -51,6 +51,7 @@ def get_analog_voltage_continuous(SCL_pin, SDA_pin, a, gain, timeout):
         this_voltage = get_analog_voltage(SCL_pin, SDA_pin, a, gain)
         voltages.append(this_voltage)
         runtime = time.time() - start_time
+        time.sleep(0.025)
     runtime_array = np.array(voltages)
     return runtime_array.mean(), runtime_array
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     SCL_pin = 1
     SDA_pin = 0
     while True:
-        for analog_signal in range(4):
+        for analog_signal in [1]:
             voltage = get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)
             print("Voltage on pin: " + str(analog_signal) + " is: " +str(voltage))
-        time.sleep(1)
+            time.sleep(.1)
