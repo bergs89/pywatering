@@ -30,8 +30,8 @@ def loop_from_soil_sensors():
     while True:
         relay_channels = [4, 27, 22, 23]
         for analog_signal in range(0,3):
-            soil_moisture.get_moisture(analog_signal)
-            if soil_moisture == 1:
+            soil_wet = soil_moisture.get_moisture(analog_signal)
+            if soil_wet == 0:
                 time.sleep(1)
                 pump_water(relay_channels[analog_signal])
                 time.sleep(1)
@@ -51,8 +51,10 @@ def loop_from_button(Button, relay):
             continue
 
 if __name__ == '__main__':
-    second = Process(target=loop_from_button, args=(Button, relay))
-    third = Process(target=loop_from_soil_sensors, args=(Button, relay))
+    # second = Process(target=loop_from_button, args=(Button, relay))
+    # third = Process(target=loop_from_soil_sensors, args=(Button, relay))
+    while True:
+        loop_from_soil_sensors()
 
 
 
