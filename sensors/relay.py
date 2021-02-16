@@ -35,7 +35,7 @@ def main_loop(relay):
     end_time = 0
     time.sleep(0.5)
     toggle_relay(relay)
-    time.sleep(0.5)
+    time.sleep(3.5)
     end_time = time.time() - start_time
 
 
