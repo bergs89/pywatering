@@ -19,10 +19,10 @@ def get_moisture(analog_signal):
     elif voltage > threshold and voltage < max_v:
         soil_moisture = 0 #soil is not wet
     elif voltage < threshold and voltage < min_v or voltage > threshold and voltage > max_v:
-        soil_moisture = 0 #soil is not wet
+        soil_moisture = 1
         print("Sensor number: " + str(analog_signal) + "might be faulty.")
     else:
-        soil_moisture = 0  # soil is not wet
+        soil_moisture = 1
         print("Something is wrong.")
     print(soil_moisture)
     return soil_moisture
