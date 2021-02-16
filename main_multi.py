@@ -12,21 +12,18 @@ def loop_relays(relay):
         # create a relay object.
         # Triggered by the output pin going low: active_high=False.
         # Initially off: initial_value=False
-        try:
-            relay.main_loop(relay.relay(relay_channel))
-        except KeyboardInterrupt:
-            # turn the relay off
-            relay.set_relay(False)
-            print("\nExiting application\n")
-            # exit the application
-            sys.exit(0)
+        pump_water(relay_channel)
 
 
 def pump_water(relay_channel):
-    relay.set_relay(False, relay.relay(relay_channel))
-    relay.toggle_relay(relay.relay(relay_channel))
-    time.sleep(5)
-    relay.toggle_relay(relay.relay(relay_channel))
+    try:
+        relay.main_loop(relay.relay(relay_channel))
+    except KeyboardInterrupt:
+        # turn the relay off
+        relay.set_relay(False)
+        print("\nExiting application\n")
+        # exit the application
+        sys.exit(0)
 
 
 def loop_from_soil_sensors():
