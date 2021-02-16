@@ -21,17 +21,27 @@ def loop_relays(relay):
             # exit the application
             sys.exit(0)
 
-def loop_from_light():
+
+def pump_water(relay_channel):
+    relay.set_relay(False, relay.relay(relay_channel))
+    relay.toggle_relay(relay.relay(relay_channel))
+    time.sleep(5)
+    relay.toggle_relay(relay.relay(relay_channel))
+
+
+def loop_from_soil_sensors():
     while True:
-        photo_resistor.get_light(13, 26)
-        time.sleep(0.25)
-        resistance = photo_resistor.get_light(13, 26)
-        normalized_light = photo_resistor.normalize_light(resistance)
-        if normalized_light < 0.1:
-            loop_relays(relay)
-        else:
-            time.sleep(0.25)
-            continue
+        relay_channels = [4, 27, 22, 23]
+        for analog_signal in range(0,3):
+            soil_moisture.get_moisture(analog_signal)
+            if soil_moisture == 1:
+                time.sleep(1)
+                pump_water(relay_channels[analog_signal])
+                time.sleep(1)
+            else:
+                time.sleep(1)
+                continue
+        time.sleep(900)
 
 
 def loop_from_button(Button, relay):
@@ -44,7 +54,8 @@ def loop_from_button(Button, relay):
             continue
 
 if __name__ == '__main__':
-    first = Process(target=loop_from_light, args=())
     second = Process(target=loop_from_button, args=(Button, relay))
+    third = Process(target=loop_from_soil_sensors, args=(Button, relay))
+
 
 

@@ -1,20 +1,44 @@
 import time
+import numpy as np
 
 from libraries import ads1115
 
 
-def get_moisture(analog_signal):
+def get_sensor_voltage(analog_signal):
     gain = 1
     SCL_pin = 1
     SDA_pin = 0
     voltage = ads1115.get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)
-    if voltage > 1.5:
-        soil_moisture = 1
+    return voltage
+
+def get_moisture(analog_signal):
+    voltage = get_sensor_voltage(analog_signal)
+    min_v, max_v, threshold = calibration(analog_signal)
+    if voltage < threshold:
+        soil_moisture = 1 #soil is wet
     else:
-        soil_moisture = 0
+        soil_moisture = 0 # soil is dry
     print(soil_moisture)
     return soil_moisture
 
+def calibration(analog_signal):
+    if analog_signal == 0:
+        min_v = 1.8
+        max_v = 2.8
+        threshold = np.mean([min_v, max_v])
+    elif analog_signal == 1:
+        min_v = 1.8
+        max_v = 2.8
+        threshold = np.mean([min_v, max_v])
+    elif analog_signal == 2:
+        min_v = 1.8
+        max_v = 2.8
+        threshold = np.mean([min_v, max_v])
+    elif analog_signal == 3:
+        min_v = 1.8
+        max_v = 2.8
+        threshold = np.mean([min_v, max_v])
+    return min_v, max_v, threshold
 
 if __name__ == "__main__":
     while True:
