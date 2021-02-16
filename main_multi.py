@@ -31,7 +31,7 @@ def loop_from_soil_sensors():
         relay_channels = [4, 27, 22, 23]
         for analog_signal in range(0,4):
             soil_wet = soil_moisture.get_moisture(analog_signal)
-            if soil_wet == 1:
+            if soil_wet == 0:
                 time.sleep(1)
                 flow_time = 5
                 pump_water(relay_channels[analog_signal], flow_time)
