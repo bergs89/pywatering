@@ -43,7 +43,7 @@ def loop_from_soil_sensors():
         time.sleep(900)
 
 
-def loop_from_button(Button, relay):
+def loop_from_button(Button):
     while True:
         button_is_pressed = Button(12).wait_for_press(timeout=600)
         if button_is_pressed:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     # second = Process(target=loop_from_button, args=(Button, relay))
     # third = Process(target=loop_from_soil_sensors, args=(Button, relay))
     threading.Thread(target=loop_from_soil_sensors).start()
-    threading.Thread(target=loop_from_button).start()
+    threading.Thread(target=loop_from_button, args=(Button, )).start()
 
 
 
