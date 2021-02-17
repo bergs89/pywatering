@@ -30,26 +30,21 @@ def pump_water(relay_channel, flow_time):
 
 
 def loop_from_soil_sensors():
-    wait_until = datetime.now(timezone.utc) + timedelta(hours=1)
-    break_loop = False
-    while not break_loop:
-        relay_channels = [4, 27, 22, 23]
-        for analog_signal in range(0,4):
-            soil_wet = soil_moisture.get_moisture(analog_signal)
-            if soil_wet == 0:
-                time.sleep(1)
-                flow_time = 5
-                pump_water(relay_channels[analog_signal], flow_time)
-                time.sleep(1)
-            else:
-                time.sleep(1)
-                continue
-        time.sleep(900)
-        if wait_until < datetime.now(timezone.utc):
-            break_loop = True
+    relay_channels = [4, 27, 22, 23]
+    for analog_signal in range(0,4):
+        soil_wet = soil_moisture.get_moisture(analog_signal)
+        if soil_wet == 0:
+            time.sleep(1)
+            flow_time = 5
+            pump_water(relay_channels[analog_signal], flow_time)
+            time.sleep(1)
+        else:
+            time.sleep(1)
+            continue
 
-def loop_from_button(Button):
-    button_is_pressed = Button(12).wait_for_press(timeout=900)
+
+def loop_from_button(Button, timeout):
+    button_is_pressed = Button(12).wait_for_press(timeout=timeout)
     if button_is_pressed:
         loop_relays()
 
@@ -57,13 +52,15 @@ def flow_calibration(flow_time):
     return flow_time
 
 if __name__ == '__main__':
+    timeout = 3600
     while True:
         light = day_or_night(place="brussels")
+        light = 1
         if light == 1:
             soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors).start()
-            button_thread = threading.Thread(target=loop_from_button, args=(Button, )).start()
+            button_thread = threading.Thread(target=loop_from_button, args=(Button, timeout)).start()
             soil_sensors_thread.join()
             button_thread.join()
         else:
-            time.sleep(900) 
+            time.sleep(timeout)
 
