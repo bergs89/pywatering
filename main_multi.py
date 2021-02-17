@@ -2,10 +2,12 @@ import sys
 import time
 import threading
 
+from datetime import datetime
+from datetime import timedelta
 from gpiozero import Button
 from sensors import photo_resistor, relay, soil_moisture
 from multiprocessing import Process
-
+from libs.light import day_or_night
 
 def loop_relays():
     relay_channels = [4, 27, 22, 23]
@@ -28,7 +30,9 @@ def pump_water(relay_channel, flow_time):
 
 
 def loop_from_soil_sensors():
-    while True:
+    wait_until = datetime.now() + timedelta(hours=1)
+    break_loop = False
+    while not break_loop:
         relay_channels = [4, 27, 22, 23]
         for analog_signal in range(0,4):
             soil_wet = soil_moisture.get_moisture(analog_signal)
@@ -41,7 +45,8 @@ def loop_from_soil_sensors():
                 time.sleep(1)
                 continue
         time.sleep(900)
-
+        if wait_until < datetime.now():
+            break_loop = True
 
 def loop_from_button(Button):
     while True:
@@ -53,10 +58,15 @@ def loop_from_button(Button):
             continue
 
 if __name__ == '__main__':
-    # second = Process(target=loop_from_button, args=(Button, relay))
-    # third = Process(target=loop_from_soil_sensors, args=(Button, relay))
-    threading.Thread(target=loop_from_soil_sensors).start()
-    threading.Thread(target=loop_from_button, args=(Button, )).start()
+    while True:
+        light = day_or_night(place="brussels")
+        if light == 1:
+            threading.Thread(target=loop_from_soil_sensors).start()
+            threading.Thread(target=loop_from_button, args=(Button, )).start()
+        else:
+            time.sleep(60*15)
+
+
 
 
 
