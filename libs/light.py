@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from suntime import Sun
 from geopy.geocoders import Nominatim
 
@@ -19,11 +19,11 @@ def get_sun_set_rise(place):
 
 def day_or_night(place):
     sun_rise, sun_dusk = get_sun_set_rise(place)
-    if datetime.now() < sun_rise:
+    if datetime.now(timezone.utc) < sun_rise:
         light_status = 0
-    elif datetime.now() > sun_rise and datetime.now() < sun_dusk:
+    elif datetime.now(timezone.utc) > sun_rise and datetime.now(timezone.utc) < sun_dusk:
         light_status = 1
-    elif datetime.now() > sun_dusk:
+    elif datetime.now(timezone.utc) > sun_dusk:
         light_status = 0
     return light_status
 
