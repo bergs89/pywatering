@@ -1,12 +1,13 @@
 import sys
 import time
+import threading
 
 from gpiozero import Button
 from sensors import photo_resistor, relay, soil_moisture
 from multiprocessing import Process
 
 
-def loop_relays(relay):
+def loop_relays():
     relay_channels = [4, 27, 22, 23]
     for relay_channel in relay_channels:
         # create a relay object.
@@ -46,7 +47,7 @@ def loop_from_button(Button, relay):
     while True:
         button_is_pressed = Button(12).wait_for_press(timeout=600)
         if button_is_pressed:
-            loop_relays(relay)
+            loop_relays()
         else:
             time.sleep(0.25)
             continue
@@ -54,8 +55,8 @@ def loop_from_button(Button, relay):
 if __name__ == '__main__':
     # second = Process(target=loop_from_button, args=(Button, relay))
     # third = Process(target=loop_from_soil_sensors, args=(Button, relay))
-    while True:
-        loop_from_soil_sensors()
+    threading.Thread(target=loop_from_soil_sensors).start()
+    threading.Thread(target=loop_from_button).start()
 
 
 
