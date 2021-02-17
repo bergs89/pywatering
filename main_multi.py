@@ -15,7 +15,7 @@ def loop_relays():
         # create a relay object.
         # Triggered by the output pin going low: active_high=False.
         # Initially off: initial_value=False
-        pump_water(relay_channel)
+        pump_water(relay_channel, flow_time = 5)
 
 
 def pump_water(relay_channel, flow_time):
@@ -56,6 +56,9 @@ def loop_from_button(Button):
         else:
             time.sleep(0.25)
             continue
+
+def flow_calibration(flow_time):
+    return flow_time
 
 if __name__ == '__main__':
     while True:
