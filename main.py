@@ -49,13 +49,9 @@ def loop_from_soil_sensors():
             break_loop = True
 
 def loop_from_button(Button):
-    while True:
-        button_is_pressed = Button(12).wait_for_press(timeout=600)
-        if button_is_pressed:
-            loop_relays()
-        else:
-            time.sleep(0.25)
-            continue
+    button_is_pressed = Button(12).wait_for_press(timeout=900)
+    if button_is_pressed:
+        loop_relays()
 
 def flow_calibration(flow_time):
     return flow_time
@@ -64,12 +60,10 @@ if __name__ == '__main__':
     while True:
         light = day_or_night(place="brussels")
         if light == 1:
-            threading.Thread(target=loop_from_soil_sensors).start()
-            threading.Thread(target=loop_from_button, args=(Button, )).start()
+            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors).start()
+            button_thread = threading.Thread(target=loop_from_button, args=(Button, )).start()
+            soil_sensors_thread.join()
+            button_thread.join()
         else:
-            time.sleep(60*15)
-
-
-
-
+            time.sleep(900)
 
