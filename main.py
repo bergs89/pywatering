@@ -55,17 +55,16 @@ if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
     while True:
+        thread_list = []
         light = day_or_night(place="brussels")
-        light = 1
         if light == 1:
-            thread_list = []
-            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time), daemon=True)
+            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time, ), daemon=True)
             thread_list.append(soil_sensors_thread)
-            flow_button = threading.Thread(target=button, args=(12, timeout), daemon=True)
-            thread_list.append(flow_button)
-            stop_button = threading.Thread(target=button, args=(6, timeout), daemon=True)
-            thread_list.append(stop_button)
-            for thread in thread_list:
-                thread.start()
-            for thread in thread_list:
-                thread.join()
+        flow_button = threading.Thread(target=button, args=(12, timeout), daemon=True)
+        thread_list.append(flow_button)
+        stop_button = threading.Thread(target=button, args=(6, timeout), daemon=True)
+        thread_list.append(stop_button)
+        for thread in thread_list:
+            thread.start()
+        for thread in thread_list:
+            thread.join()
