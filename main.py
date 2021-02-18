@@ -33,13 +33,13 @@ def loop_from_soil_sensors():
         soil_wet = soil_moisture.get_moisture(analog_signal)
         if soil_wet == 0:
             time.sleep(1)
-            flow_time = 5
+            flow_time = 1
             pump_water(relay_channels[analog_signal], flow_time)
             time.sleep(1)
 
 
-def loop_from_button(Button, timeout):
-    button_is_pressed = Button(12).wait_for_press(timeout=timeout)
+def button(pin, timeout):
+    button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
     if button_is_pressed:
         loop_relays()
 
@@ -54,7 +54,14 @@ if __name__ == '__main__':
         light = day_or_night(place="brussels")
         light = 1
         if light == 1:
-            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=()).start()
-            button_thread = threading.Thread(target=loop_from_button, args=(Button, timeout)).start()
-            soil_sensors_thread.join()
-            button_thread.join()
+            thread_list = []
+            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, daemon=True)
+            thread_list.append(soil_sensors_thread)
+            flow_button = threading.Thread(target=button, args=(12, timeout), daemon=True)
+            thread_list.append(flow_button)
+            stop_button = threading.Thread(target=button, args=(6, timeout), daemon=True)
+            thread_list.append(stop_button)
+            for thread in thread_list:
+                thread.start()
+            for thread in thread_list:
+                thread.join()
