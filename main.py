@@ -2,11 +2,10 @@ import sys
 import time
 import threading
 
-from datetime import datetime, timezone
-from datetime import timedelta
 from gpiozero import Button
 from sensors import photo_resistor, relay, soil_moisture
 from libs.light import day_or_night
+
 
 def loop_relays():
     relay_channels = [4, 27, 22, 23]
@@ -37,9 +36,6 @@ def loop_from_soil_sensors():
             flow_time = 5
             pump_water(relay_channels[analog_signal], flow_time)
             time.sleep(1)
-        else:
-            time.sleep(1)
-            continue
 
 
 def loop_from_button(Button, timeout):
