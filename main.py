@@ -38,9 +38,13 @@ def loop_from_soil_sensors(flow_time):
 
 
 def button(pin, timeout):
-    button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
-    if button_is_pressed:
-        loop_relays(flow_time)
+    start_time = time.time()
+    total_time = 0
+    while total_time < timeout:
+        button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
+        if button_is_pressed:
+            loop_relays(flow_time)
+        total_time = time.time() - start_time
 
 
 def flow_calibration(flow_time):
