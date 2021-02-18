@@ -7,10 +7,10 @@ from sensors import photo_resistor, relay, soil_moisture
 from libs.light import day_or_night
 
 
-def loop_relays():
+def loop_relays(flow_time):
     relay_channels = [4, 27, 22, 23]
     for relay_channel in relay_channels:
-        pump_water(relay_channel, flow_time = 5)
+        pump_water(relay_channel, flow_time)
 
 
 def pump_water(relay_channel, flow_time):
@@ -27,13 +27,12 @@ def pump_water(relay_channel, flow_time):
         sys.exit(0)
 
 
-def loop_from_soil_sensors():
+def loop_from_soil_sensors(flow_time):
     relay_channels = [4, 27, 22, 23]
     for analog_signal in range(0,4):
         soil_wet = soil_moisture.get_moisture(analog_signal)
         if soil_wet == 0:
             time.sleep(1)
-            flow_time = 1
             pump_water(relay_channels[analog_signal], flow_time)
             time.sleep(1)
 
@@ -41,7 +40,7 @@ def loop_from_soil_sensors():
 def button(pin, timeout):
     button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
     if button_is_pressed:
-        loop_relays()
+        loop_relays(flow_time)
 
 
 def flow_calibration(flow_time):
@@ -50,12 +49,13 @@ def flow_calibration(flow_time):
 
 if __name__ == '__main__':
     timeout = 3600
+    flow_time = 2
     while True:
         light = day_or_night(place="brussels")
         light = 1
         if light == 1:
             thread_list = []
-            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, daemon=True)
+            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time), daemon=True)
             thread_list.append(soil_sensors_thread)
             flow_button = threading.Thread(target=button, args=(12, timeout), daemon=True)
             thread_list.append(flow_button)
