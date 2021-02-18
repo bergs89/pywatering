@@ -33,7 +33,8 @@ def main_loop(relay, opening_time):
     set_relay(False, relay)
     time.sleep(0.5)
     toggle_relay(relay)
-    time.sleep(0.5+opening_time)
+    time.sleep(opening_time)
+    set_relay(False, relay)
 
 
 if __name__ == "__main__":
