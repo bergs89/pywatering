@@ -7,6 +7,12 @@ from sensors import photo_resistor, relay, soil_moisture
 from libs.light import day_or_night
 
 
+def set_relays_off():
+    relay_channels = [4, 27, 22, 23]
+    for relay_channel in relay_channels:
+        relay.set_relay(False, relay.relay(relay_channel))
+
+
 def loop_relays(flow_time):
     relay_channels = [4, 27, 22, 23]
     for relay_channel in relay_channels:
@@ -66,6 +72,7 @@ def flow_calibration(flow_time):
 if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
+    set_relays_off()
     while True:
         thread_list = []
         light = day_or_night(place="brussels")
