@@ -71,8 +71,8 @@ def flow_calibration(flow_time):
 if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
-    stop_button_pressed = 0
-    while True and stop_button_pressed == 0:
+    stop_threads = False
+    while True:
         thread_list = []
         light = day_or_night(place="brussels")
         if light == 1:
