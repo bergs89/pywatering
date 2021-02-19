@@ -45,18 +45,22 @@ def flow_button(pin, timeout):
         if button_is_pressed:
             loop_relays(flow_time)
         total_time = time.time() - start_time
+        global stop_threads
+        if stop_threads:
+            break
 
-def stop_button(pin, timeout, thread_list):
+def stop_button(pin, timeout):
     start_time = time.time()
     total_time = 0
     stop_button_pressed = 0
     while total_time < timeout or stop_button_pressed == 0:
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
-            stop_button_pressed = 1
-            for thread in thread_list:
-                thread._stop.set()
+            stop_threads = True
         total_time = time.time() - start_time
+        global stop_threads
+        if stop_threads:
+            break
     return stop_button_pressed
 
 
@@ -76,7 +80,7 @@ if __name__ == '__main__':
             thread_list.append(soil_sensors_thread)
         flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
         thread_list.append(flow_button)
-        stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout, thread_list), daemon=True)
+        stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout), daemon=True)
         thread_list.append(stop_button_pressed)
         for thread in thread_list:
             thread.start()
