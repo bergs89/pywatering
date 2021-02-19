@@ -8,9 +8,11 @@ def toggle_main_pywatering(main_running):
     if main_running == True:
         cmd = "sudo systemctl stop pywatering.service"
         main_running = False
+        print("Process main.py stopped")
     elif main_running == False:
         cmd = "sudo systemctl start pywatering.service"
         main_running = True
+        print("Process main.py started")
     subprocess.call([cmd], shell=True)
     return main_running
 
