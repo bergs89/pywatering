@@ -47,7 +47,7 @@ def flow_button(pin, timeout):
         total_time = time.time() - start_time
 
 
-def stop_button(pin, timeout, thread_list):
+def stop_button(pin, timeout):
     start_time = time.time()
     total_time = 0
     stop_button_pressed = 0
@@ -59,6 +59,22 @@ def stop_button(pin, timeout, thread_list):
     return stop_button_pressed
 
 
+def run_loops(flow_time, timeout):
+    thread_list = []
+    light = day_or_night(place="brussels")
+    if light == 1:
+        soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time,))
+        thread_list.append(soil_sensors_thread)
+    flow_button = threading.Thread(target=flow_button, args=(12, timeout))
+    thread_list.append(flow_button)
+    # stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout))
+    # thread_list.append(stop_button_pressed)
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
+
+
 def flow_calibration(flow_time):
     return flow_time
 
@@ -67,18 +83,10 @@ if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
     while True:
-        thread_list = []
-        light = day_or_night(place="brussels")
-        if light == 1:
-            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time, ), daemon=True)
-            thread_list.append(soil_sensors_thread)
-        flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
-        thread_list.append(flow_button)
-        stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout, thread_list), daemon=True)
-        thread_list.append(stop_button_pressed)
-        for thread in thread_list:
-            thread.start()
-        for thread in thread_list:
-            thread.join()
+        run_loops(flow_time, timeout)
+        print("done")
+        stop_button_pressed = stop_button(6, timeout)
         if stop_button_pressed == True:
             sys.exit()
+        else:
+            continue
