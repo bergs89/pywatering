@@ -37,7 +37,7 @@ def loop_from_soil_sensors(flow_time):
             time.sleep(1)
 
 
-def button(pin, timeout):
+def flow_button(pin, timeout):
     start_time = time.time()
     total_time = 0
     while total_time < timeout:
@@ -45,6 +45,17 @@ def button(pin, timeout):
         if button_is_pressed:
             loop_relays(flow_time)
         total_time = time.time() - start_time
+
+def stop_button(pin, timeout):
+    start_time = time.time()
+    total_time = 0
+    stop_button_pressed = 0
+    while total_time < timeout or stop_button_pressed == 0:
+        button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
+        if button_is_pressed:
+            stop_button_pressed = 1
+        total_time = time.time() - start_time
+    return stop_button_pressed
 
 
 def flow_calibration(flow_time):
@@ -54,16 +65,17 @@ def flow_calibration(flow_time):
 if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
-    while True:
+    stop_button = 0
+    while True and stop_button_pressed == 0:
         thread_list = []
         light = day_or_night(place="brussels")
         if light == 1:
             soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time, ), daemon=True)
             thread_list.append(soil_sensors_thread)
-        flow_button = threading.Thread(target=button, args=(12, timeout), daemon=True)
+        flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
         thread_list.append(flow_button)
-        stop_button = threading.Thread(target=button, args=(6, timeout), daemon=True)
-        thread_list.append(stop_button)
+        stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout), daemon=True)
+        thread_list.append(stop_button_pressed)
         for thread in thread_list:
             thread.start()
         for thread in thread_list:
