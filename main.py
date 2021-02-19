@@ -70,13 +70,14 @@ def flow_calibration(flow_time):
 
 
 if __name__ == '__main__':
+    debugging = 1
     timeout = 3600
     flow_time = 2
     set_relays_off()
     while True:
         thread_list = []
         light = day_or_night(place="brussels")
-        if light == 1:
+        if light == 1 or debugging == 1:
             soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time, ), daemon=True)
             thread_list.append(soil_sensors_thread)
         flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
