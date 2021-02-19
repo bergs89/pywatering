@@ -40,27 +40,28 @@ def loop_from_soil_sensors(flow_time):
 def flow_button(pin, timeout):
     start_time = time.time()
     total_time = 0
+    global stop_threads
     while total_time < timeout:
+        if stop_threads:
+            break
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
             loop_relays(flow_time)
         total_time = time.time() - start_time
-        global stop_threads
-        if stop_threads:
-            break
+
 
 def stop_button(pin, timeout):
     start_time = time.time()
     total_time = 0
     stop_button_pressed = 0
+    global stop_threads
     while total_time < timeout or stop_button_pressed == 0:
+        if stop_threads:
+            break
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
             stop_threads = True
         total_time = time.time() - start_time
-        global stop_threads
-        if stop_threads:
-            break
     return stop_button_pressed
 
 
