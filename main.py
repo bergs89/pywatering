@@ -55,9 +55,6 @@ def stop_button(pin, timeout, thread_list):
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
             stop_button_pressed = True
-            # for thread in thread_list:
-            #     thread._Thread_stop()
-            sys.exit()
         total_time = time.time() - start_time
     return stop_button_pressed
 
@@ -83,3 +80,5 @@ if __name__ == '__main__':
             thread.start()
         for thread in thread_list:
             thread.join()
+        if stop_button_pressed == True:
+            sys.exit()
