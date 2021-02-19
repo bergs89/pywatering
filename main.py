@@ -40,10 +40,7 @@ def loop_from_soil_sensors(flow_time):
 def flow_button(pin, timeout):
     start_time = time.time()
     total_time = 0
-    global stop_threads
     while total_time < timeout:
-        if stop_threads:
-            break
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
             loop_relays(flow_time)
@@ -53,16 +50,22 @@ def flow_button(pin, timeout):
 def stop_button(pin, timeout):
     start_time = time.time()
     total_time = 0
-    stop_button_pressed = 0
-    global stop_threads
-    while total_time < timeout or stop_button_pressed == 0:
-        if stop_threads:
-            break
+    while total_time < timeout:
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
-            stop_threads = True
+            loop_relays(flow_time)
         total_time = time.time() - start_time
-    return stop_button_pressed
+
+# def stop_button(pin, timeout):
+#     start_time = time.time()
+#     total_time = 0
+#     stop_button_pressed = 0
+#     while total_time < timeout or stop_button_pressed == 0:
+#         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
+#         if button_is_pressed:
+#             stop_threads = True
+#         total_time = time.time() - start_time
+#     return stop_button_pressed
 
 
 def flow_calibration(flow_time):
@@ -72,7 +75,6 @@ def flow_calibration(flow_time):
 if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
-    stop_threads = False
     while True:
         thread_list = []
         light = day_or_night(place="brussels")
