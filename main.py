@@ -59,7 +59,7 @@ def stop_button(pin, timeout):
     return stop_button_pressed
 
 
-def run_loops(flow_time, timeout):
+def run_loops(flow_time, timeout, flow_button):
     thread_list = []
     light = day_or_night(place="brussels")
     if light == 1:
@@ -82,8 +82,9 @@ def flow_calibration(flow_time):
 if __name__ == '__main__':
     timeout = 3600
     flow_time = 2
+    flow_button = flow_button()
     while True:
-        run_loops(flow_time, timeout)
+        run_loops(flow_time, timeout. flow_button)
         print("done")
         stop_button_pressed = stop_button(6, timeout)
         if stop_button_pressed == True:
