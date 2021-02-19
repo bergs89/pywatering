@@ -3,7 +3,7 @@ import time
 import threading
 
 from gpiozero import Button
-from sensors import photo_resistor, relay, soil_moisture
+from sensors import relay, soil_moisture
 from libs.light import day_or_night
 
 
@@ -53,18 +53,6 @@ def flow_button(pin, timeout):
         total_time = time.time() - start_time
 
 
-def stop_button(pin, timeout, thread_list):
-    start_time = time.time()
-    total_time = 0
-    stop_button_pressed = 0
-    while total_time < timeout:
-        button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
-        if button_is_pressed:
-            stop_button_pressed = True
-        total_time = time.time() - start_time
-    return stop_button_pressed
-
-
 def flow_calibration(flow_time):
     return flow_time
 
@@ -82,11 +70,7 @@ if __name__ == '__main__':
             thread_list.append(soil_sensors_thread)
         flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
         thread_list.append(flow_button)
-        stop_button_pressed = threading.Thread(target=stop_button, args=(6, timeout, thread_list), daemon=True)
-        thread_list.append(stop_button_pressed)
         for thread in thread_list:
             thread.start()
         for thread in thread_list:
             thread.join()
-        if stop_button_pressed == True:
-            sys.exit()
