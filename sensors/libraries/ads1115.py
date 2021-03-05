@@ -61,7 +61,7 @@ if __name__ == "__main__":
     SCL_pin = 1
     SDA_pin = 0
     while True:
-        for analog_signal in [1]:
+        for analog_signal in [0, 1, 2, 3]:
             voltage = get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)
             print("Voltage on pin: " + str(analog_signal) + " is: " +str(voltage))
             time.sleep(.1)

@@ -33,20 +33,20 @@ def get_moisture(analog_signal):
 
 def calibration(analog_signal):
     if analog_signal == 0:
-        min_v = 1.8
-        max_v = 2.8
+        min_v = 1.32
+        max_v = 2.87
         threshold = np.mean([min_v, max_v])
     elif analog_signal == 1:
-        min_v = 1.5
-        max_v = 2.8
+        min_v = 1.32
+        max_v = 2.9
         threshold = np.mean([min_v, max_v])
     elif analog_signal == 2:
-        min_v = 1.8
-        max_v = 2.8
+        min_v = 1.36
+        max_v = 2.95
         threshold = np.mean([min_v, max_v])
     elif analog_signal == 3:
-        min_v = 1.8
-        max_v = 2.8
+        min_v = 1.35
+        max_v = 2.93
         threshold = np.mean([min_v, max_v])
     return min_v, max_v, threshold
 
