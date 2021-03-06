@@ -6,9 +6,11 @@ from sensors.libraries import bme280
 
 
 def save_plot_as_pic(x, y, figname):
+    plt.figure()
     plt.plot(x, y)
     plt.gcf().autofmt_xdate()
     plt.savefig(figname)
+    plt.close('all')
 
 
 def store_env_data_indefinetely():
