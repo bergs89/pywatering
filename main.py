@@ -58,7 +58,7 @@ def flow_calibration(flow_time):
 
 
 if __name__ == '__main__':
-    debugging = 1
+    debugging = 0
     timeout = 3600
     flow_time = 2
     set_relays_off()
@@ -74,3 +74,4 @@ if __name__ == '__main__':
             thread.start()
         for thread in thread_list:
             thread.join()
+

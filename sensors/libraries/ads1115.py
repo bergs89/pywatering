@@ -58,8 +58,8 @@ def get_analog_voltage_continuous(SCL_pin, SDA_pin, a, gain, timeout):
 
 if __name__ == "__main__":
     gain = 1
-    SCL_pin = 1
-    SDA_pin = 0
+    SCL_pin = 3
+    SDA_pin = 2
     while True:
         for analog_signal in [0, 1, 2, 3]:
             voltage = get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)

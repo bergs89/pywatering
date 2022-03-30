@@ -1,13 +1,13 @@
 import time
 import numpy as np
 
-from sensors.libraries import ads1115
+from libraries import ads1115
 
 
 def get_sensor_voltage(analog_signal):
     gain = 1
-    SCL_pin = 1
-    SDA_pin = 0
+    SCL_pin = 3
+    SDA_pin = 2
     voltage = ads1115.get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain)
     return voltage
 
