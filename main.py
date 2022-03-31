@@ -8,7 +8,19 @@ from libs.light import day_or_night
 import paho.mqtt.client as mqtt
 
 
-def publish_soil_status(
+def read_pywatering_toogle_mqtt(
+        topic,
+):
+    mqttBroker = "localhost"
+    client = mqtt.Client("Temperature_Inside")
+    client.connect(mqttBroker)
+    result, mid = client.subscribe(
+        topic,
+    )
+    return result
+
+
+def publish_soil_status_mqtt(
         analog_signal,
         soil_wet,
 ):
@@ -54,7 +66,7 @@ def loop_from_soil_sensors(flow_time):
     relay_channels = [4, 27, 22, 23]
     for analog_signal in range(0,4):
         soil_wet = soil_moisture.get_moisture(analog_signal)
-        publish_soil_status(
+        publish_soil_status_mqtt(
             analog_signal,
             soil_wet,
         )
@@ -86,7 +98,10 @@ if __name__ == '__main__':
     # while True:
     thread_list = []
     light = day_or_night(place="brussels")
-    if light == 1 or debugging == 1:
+    system_toggle = read_pywatering_toogle_mqtt(
+        "PYWATERING",
+    )
+    if (light == 1 and system_toggle == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
             args=(
