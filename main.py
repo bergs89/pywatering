@@ -145,21 +145,11 @@ if __name__ == '__main__':
     # while True:
     thread_list = []
     light = day_or_night(place="brussels")
-    system_toggle = read_pywatering_toogle_mqtt(
-        "PYWATERING",
-    )
-    plant1_toggle = read_pywatering_toogle_mqtt(
-        "PLANT1",
-    )
-    plant2_toggle = read_pywatering_toogle_mqtt(
-        "PLANT2",
-    )
-    plant3_toggle = read_pywatering_toogle_mqtt(
-        "PLANT3",
-    )
-    plant4_toggle = read_pywatering_toogle_mqtt(
-        "PLANT4",
-    )
+    system_toggle = read_pywatering_toogle_mqtt("PYWATERING",)
+    plant1_toggle = read_pywatering_toogle_mqtt("PLANT1",)
+    plant2_toggle = read_pywatering_toogle_mqtt("PLANT2",)
+    plant3_toggle = read_pywatering_toogle_mqtt("PLANT3")
+    plant4_toggle = read_pywatering_toogle_mqtt("PLANT4",)
     if (light == 1 and system_toggle == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
@@ -173,20 +163,20 @@ if __name__ == '__main__':
             daemon=True,
         )
         thread_list.append(soil_sensors_thread)
-        flow_button = threading.Thread(
-            target=flow_button,
-            args=(
-                12,
-                plant1_toggle,
-                plant2_toggle,
-                plant3_toggle,
-                plant4_toggle,
-                timeout,
-            ),
-            daemon=True,
-        )
+        # flow_button = threading.Thread(
+        #     target=flow_button,
+        #     args=(
+        #         12,
+        #         plant1_toggle,
+        #         plant2_toggle,
+        #         plant3_toggle,
+        #         plant4_toggle,
+        #         timeout,
+        #     ),
+        #     daemon=True,
+        # )
 
-        thread_list.append(flow_button)
+        # thread_list.append(flow_button)
         for thread in thread_list:
             thread.start()
         for thread in thread_list:
