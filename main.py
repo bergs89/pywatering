@@ -5,15 +5,16 @@ import threading
 from gpiozero import Button
 from sensors import relay, soil_moisture
 from libs.light import day_or_night
-# import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 from paho.mqtt.client import Client
+
 
 def on_connect(
         client,
-        topic,
         userdata,
         flags,
         rc,
+        topic,
 ):
     print("Connected")
     client.subscribe(topic)
@@ -29,6 +30,7 @@ def on_message(
     global global_message
     global_message = m_decode
 
+
 def get_mqtt_payload(topic):
     mqttBroker = "localhost"
     client = Client("Temperature_Inside")
@@ -36,7 +38,7 @@ def get_mqtt_payload(topic):
     client.on_message = on_message
     client.connect("localhost")
     client.loop_start()
-    time.sleep(2)
+    time.sleep(4)
     client.loop_stop()
     return global_message
 
