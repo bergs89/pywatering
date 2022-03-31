@@ -9,7 +9,7 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.client import Client
 
 
-def on_connect(
+def on_connect_st(
         client,
         userdata,
         flags,
@@ -17,6 +17,45 @@ def on_connect(
 ):
     print("Connected")
     client.subscribe("PYWATERING")
+
+
+def on_connect_plant1(
+        client,
+        userdata,
+        flags,
+        rc,
+):
+    print("Connected")
+    client.subscribe("PLANT1")
+
+
+def on_connect_plant2(
+        client,
+        userdata,
+        flags,
+        rc,
+):
+    print("Connected")
+    client.subscribe("PLANT2")
+
+def on_connect_plant3(
+        client,
+        userdata,
+        flags,
+        rc,
+):
+    print("Connected")
+    client.subscribe("PLANT3")
+
+
+def on_connect_plant4(
+        client,
+        userdata,
+        flags,
+        rc,
+):
+    print("Connected")
+    client.subscribe("PLANT4")
 
 
 def on_message(
@@ -33,11 +72,22 @@ def on_message(
 def get_mqtt_payload(topic):
     mqttBroker = "localhost"
     client = Client("Temperature_Inside")
-    client.on_connect = on_connect
+
+    if topic == "PYWATERING":
+        client.on_connect = on_connect_st
+    elif topic == "PLANT1":
+        client.on_connect = on_connect_plant1
+    elif topic == "PLANT2":
+        client.on_connect = on_connect_plant2
+    elif topic == "PLANT3":
+        client.on_connect = on_connect_plant3
+    elif topic == "PLANT4":
+        client.on_connect = on_connect_plant4
+
     client.on_message = on_message
     client.connect("localhost")
     client.loop_start()
-    time.sleep(4)
+    time.sleep(2)
     client.loop_stop()
     return global_message
 
