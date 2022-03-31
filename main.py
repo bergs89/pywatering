@@ -81,17 +81,32 @@ def pump_water(relay_channel, flow_time):
         sys.exit(0)
 
 
-def loop_from_soil_sensors(flow_time):
+def loop_from_soil_sensors(
+        plant1_toggle,
+        plant2_toggle,
+        plant3_toggle,
+        plant4_toggle,
+        flow_time,
+):
     relay_channels = [4, 27, 22, 23]
+    toggles = [
+        plant1_toggle,
+        plant2_toggle,
+        plant3_toggle,
+        plant4_toggle,
+    ]
     for analog_signal in range(0,4):
         soil_wet = soil_moisture.get_moisture(analog_signal)
         publish_soil_status_mqtt(
             analog_signal,
             soil_wet,
         )
-        if soil_wet == 0:
+        if soil_wet == 0 and toggles[analog_signal] == 1:
             time.sleep(1)
-            pump_water(relay_channels[analog_signal], flow_time)
+            pump_water(
+                relay_channels[analog_signal],
+                flow_time,
+            )
             time.sleep(1)
 
 
@@ -149,27 +164,31 @@ if __name__ == '__main__':
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
             args=(
+                plant1_toggle,
+                plant2_toggle,
+                plant3_toggle,
+                plant4_toggle,
                 flow_time,
             ),
             daemon=True,
         )
         thread_list.append(soil_sensors_thread)
-    flow_button = threading.Thread(
-        target=flow_button,
-        args=(
-            12,
-            plant1_toggle,
-            plant2_toggle,
-            plant3_toggle,
-            plant4_toggle,
-            timeout,
-        ),
-        daemon=True,
-    )
+        flow_button = threading.Thread(
+            target=flow_button,
+            args=(
+                12,
+                plant1_toggle,
+                plant2_toggle,
+                plant3_toggle,
+                plant4_toggle,
+                timeout,
+            ),
+            daemon=True,
+        )
 
-    thread_list.append(flow_button)
-    for thread in thread_list:
-        thread.start()
-    for thread in thread_list:
-        thread.join()
+        thread_list.append(flow_button)
+        for thread in thread_list:
+            thread.start()
+        for thread in thread_list:
+            thread.join()
 
