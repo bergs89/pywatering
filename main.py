@@ -17,7 +17,7 @@ def read_pywatering_toogle_mqtt(
     result, mid = client.subscribe(
         topic,
     )
-    return result
+    return mid
 
 
 def publish_soil_status_mqtt(
@@ -34,6 +34,7 @@ def publish_soil_status_mqtt(
     elif soil_wet == 0:
         payload = "DRY SOIL"
     client.publish(moisture_sensor_name, payload)
+    print("Published MQTT " + moisture_sensor_name+ ": " + payload)
 
 
 def set_relays_off():
@@ -42,10 +43,28 @@ def set_relays_off():
         relay.set_relay(False, relay.relay(relay_channel))
 
 
-def loop_relays(flow_time):
-    relay_channels = [4, 27, 22, 23]
+def loop_relays(
+    plant1_toggle,
+    plant2_toggle,
+    plant3_toggle,
+    plant4_toggle,
+    flow_time,
+):
+    relay_channels = []
+    if plant1_toggle == 1:
+        relay_channels.append(4)
+    if plant2_toggle == 1:
+        relay_channels.append(27)
+    if plant3_toggle == 1:
+        relay_channels.append(22)
+    if plant4_toggle == 1:
+        relay_channels.append(23)
+    # relay_channels = [4, 27, 22, 23]
     for relay_channel in relay_channels:
-        pump_water(relay_channel, flow_time)
+        pump_water(
+            relay_channel,
+            flow_time
+        )
 
 
 def pump_water(relay_channel, flow_time):
@@ -76,13 +95,26 @@ def loop_from_soil_sensors(flow_time):
             time.sleep(1)
 
 
-def flow_button(pin, timeout):
+def flow_button(
+        pin,
+        plant1_toggle,
+        plant2_toggle,
+        plant3_toggle,
+        plant4_toggle,
+        timeout,
+):
     start_time = time.time()
     total_time = 0
     while total_time < timeout:
         button_is_pressed = Button(pin).wait_for_press(timeout=timeout)
         if button_is_pressed:
-            loop_relays(flow_time)
+            loop_relays(
+                plant1_toggle,
+                plant2_toggle,
+                plant3_toggle,
+                plant4_toggle,
+                flow_time,
+                        )
         total_time = time.time() - start_time
 
 
@@ -101,6 +133,18 @@ if __name__ == '__main__':
     system_toggle = read_pywatering_toogle_mqtt(
         "PYWATERING",
     )
+    plant1_toggle = read_pywatering_toogle_mqtt(
+        "PLANT1",
+    )
+    plant2_toggle = read_pywatering_toogle_mqtt(
+        "PLANT2",
+    )
+    plant3_toggle = read_pywatering_toogle_mqtt(
+        "PLANT3",
+    )
+    plant4_toggle = read_pywatering_toogle_mqtt(
+        "PLANT4",
+    )
     if (light == 1 and system_toggle == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
@@ -114,6 +158,10 @@ if __name__ == '__main__':
         target=flow_button,
         args=(
             12,
+            plant1_toggle,
+            plant2_toggle,
+            plant3_toggle,
+            plant4_toggle,
             timeout,
         ),
         daemon=True,
