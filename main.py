@@ -64,7 +64,7 @@ def on_message(
         msg,
 ):
     m_decode = str(msg.payload.decode("utf-8"))
-    print(m_decode)
+    print("Received message from MQTT: " + m_decode + " from topic: " + msg.topic)
     global global_message
     global_message = m_decode
 
@@ -229,18 +229,13 @@ if __name__ == '__main__':
     # while True:
     thread_list = []
     light = day_or_night(place="brussels")
+
     system_toggle = get_mqtt_payload("PYWATERING",)
     plant1_toggle = get_mqtt_payload("PLANT1",)
     plant2_toggle = get_mqtt_payload("PLANT2",)
     plant3_toggle = get_mqtt_payload("PLANT3")
     plant4_toggle = get_mqtt_payload("PLANT4",)
-    print(
-        plant1_toggle,
-        plant2_toggle,
-        plant3_toggle,
-        plant4_toggle,
-        system_toggle,
-    )
+
     if (light == 1 and system_toggle == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,

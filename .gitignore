@@ -2,3 +2,6 @@ venv
 .idea/misc.xml
 .idea/pywatering.iml
 .idea/pywatering.iml
+.idea/misc.xml
+*.xml
+*.iml
