@@ -5,19 +5,52 @@ import threading
 from gpiozero import Button
 from sensors import relay, soil_moisture
 from libs.light import day_or_night
-import paho.mqtt.client as mqtt
+# import paho.mqtt.client as mqtt
+from paho.mqtt.client import Client
 
-
-def read_pywatering_toogle_mqtt(
+def on_connect(
+        client,
         topic,
+        userdata,
+        flags,
+        rc,
 ):
+    print("Connected")
+    client.subscribe(topic)
+
+
+def on_message(
+        client,
+        userdata,
+        msg,
+):
+    m_decode = str(msg.payload.decode("utf-8"))
+    print(m_decode)
+    global global_message
+    global_message = m_decode
+
+def get_mqtt_payload(topic):
     mqttBroker = "localhost"
-    client = mqtt.Client("Temperature_Inside")
-    client.connect(mqttBroker)
-    result, mid = client.subscribe(
-        topic,
-    )
-    return mid
+    client = Client("Temperature_Inside")
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect("localhost")
+    client.loop_start()
+    time.sleep(2)
+    client.loop_stop()
+    return global_message
+
+
+# def read_pywatering_toogle_mqtt(
+#         topic,
+# ):
+#     mqttBroker = "localhost"
+#     client = mqtt.Client("Temperature_Inside")
+#     client.connect(mqttBroker)
+#     result, mid = client.subscribe(
+#         topic,
+#     )
+#     return mid
 
 
 def publish_soil_status_mqtt(
@@ -145,11 +178,11 @@ if __name__ == '__main__':
     # while True:
     thread_list = []
     light = day_or_night(place="brussels")
-    system_toggle = read_pywatering_toogle_mqtt("PYWATERING",)
-    plant1_toggle = read_pywatering_toogle_mqtt("PLANT1",)
-    plant2_toggle = read_pywatering_toogle_mqtt("PLANT2",)
-    plant3_toggle = read_pywatering_toogle_mqtt("PLANT3")
-    plant4_toggle = read_pywatering_toogle_mqtt("PLANT4",)
+    system_toggle = get_mqtt_payload("PYWATERING",)
+    plant1_toggle = get_mqtt_payload("PLANT1",)
+    plant2_toggle = get_mqtt_payload("PLANT2",)
+    plant3_toggle = get_mqtt_payload("PLANT3")
+    plant4_toggle = get_mqtt_payload("PLANT4",)
     print(
         plant1_toggle,
         plant2_toggle,
