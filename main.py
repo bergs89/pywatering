@@ -5,7 +5,6 @@ import threading
 from gpiozero import Button
 from sensors import relay, soil_moisture
 from libs.light import day_or_night
-import paho.mqtt.client as mqtt
 from paho.mqtt.client import Client
 
 
@@ -109,7 +108,7 @@ def publish_soil_status_mqtt(
         soil_wet,
 ):
     mqttBroker = "localhost"
-    client = mqtt.Client("Temperature_Inside")
+    client = Client("Temperature_Inside")
     client.connect(mqttBroker)
     moisture_sensor_number = analog_signal + 1
     moisture_sensor_name = "MOISTURE" + str(moisture_sensor_number)
@@ -118,7 +117,7 @@ def publish_soil_status_mqtt(
     elif soil_wet == 0:
         payload = "DRY SOIL"
     client.publish(moisture_sensor_name, payload)
-    print("Published MQTT " + moisture_sensor_name+ ": " + payload)
+    print("Published MQTT " + moisture_sensor_name + ": " + payload)
 
 
 def set_relays_off():
@@ -135,13 +134,13 @@ def loop_relays(
     flow_time,
 ):
     relay_channels = []
-    if plant1_toggle == 1:
+    if int(plant1_toggle) == 1:
         relay_channels.append(4)
-    if plant2_toggle == 1:
+    if int(plant2_toggle) == 1:
         relay_channels.append(27)
-    if plant3_toggle == 1:
+    if int(plant3_toggle) == 1:
         relay_channels.append(22)
-    if plant4_toggle == 1:
+    if int(plant4_toggle) == 1:
         relay_channels.append(23)
     # relay_channels = [4, 27, 22, 23]
     for relay_channel in relay_channels:
@@ -230,13 +229,13 @@ if __name__ == '__main__':
     thread_list = []
     light = day_or_night(place="brussels")
 
-    system_toggle = get_mqtt_payload("PYWATERING",)
-    plant1_toggle = get_mqtt_payload("PLANT1",)
-    plant2_toggle = get_mqtt_payload("PLANT2",)
-    plant3_toggle = get_mqtt_payload("PLANT3")
-    plant4_toggle = get_mqtt_payload("PLANT4",)
-
-    if (light == 1 and system_toggle == 1) or debugging == 1:
+    system_toggle = int(get_mqtt_payload("PYWATERING",))
+    plant1_toggle = int(get_mqtt_payload("PLANT1",))
+    plant2_toggle = int(get_mqtt_payload("PLANT2",))
+    plant3_toggle = int(get_mqtt_payload("PLANT3"))
+    plant4_toggle = int(get_mqtt_payload("PLANT4",))
+    print(light)
+    if (light == 1 and int(system_toggle) == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
             args=(
