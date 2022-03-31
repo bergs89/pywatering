@@ -150,6 +150,13 @@ if __name__ == '__main__':
     plant2_toggle = read_pywatering_toogle_mqtt("PLANT2",)
     plant3_toggle = read_pywatering_toogle_mqtt("PLANT3")
     plant4_toggle = read_pywatering_toogle_mqtt("PLANT4",)
+    print(
+        plant1_toggle,
+        plant2_toggle,
+        plant3_toggle,
+        plant4_toggle,
+        system_toggle,
+    )
     if (light == 1 and system_toggle == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
