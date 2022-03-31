@@ -14,10 +14,9 @@ def on_connect(
         userdata,
         flags,
         rc,
-        topic,
 ):
     print("Connected")
-    client.subscribe(topic)
+    client.subscribe("PYWATERING")
 
 
 def on_message(
