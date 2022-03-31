@@ -5,6 +5,23 @@ import threading
 from gpiozero import Button
 from sensors import relay, soil_moisture
 from libs.light import day_or_night
+import paho.mqtt.client as mqtt
+
+
+def publish_soil_status(
+        analog_signal,
+        soil_wet,
+):
+    mqttBroker = "localhost"
+    client = mqtt.Client("Temperature_Inside")
+    client.connect(mqttBroker)
+    moisture_sensor_number = analog_signal + 1
+    moisture_sensor_name = "MOISTURE" + str(moisture_sensor_number)
+    if soil_wet == 1:
+        payload = "WET SOIL"
+    elif soil_wet == 0:
+        payload = "DRY SOIL"
+    client.publish(moisture_sensor_name, payload)
 
 
 def set_relays_off():
@@ -37,6 +54,10 @@ def loop_from_soil_sensors(flow_time):
     relay_channels = [4, 27, 22, 23]
     for analog_signal in range(0,4):
         soil_wet = soil_moisture.get_moisture(analog_signal)
+        publish_soil_status(
+            analog_signal,
+            soil_wet,
+        )
         if soil_wet == 0:
             time.sleep(1)
             pump_water(relay_channels[analog_signal], flow_time)
@@ -59,19 +80,33 @@ def flow_calibration(flow_time):
 
 if __name__ == '__main__':
     debugging = 0
-    timeout = 3600
+    timeout = 10
     flow_time = 2
     set_relays_off()
-    while True:
-        thread_list = []
-        light = day_or_night(place="brussels")
-        if light == 1 or debugging == 1:
-            soil_sensors_thread = threading.Thread(target=loop_from_soil_sensors, args=(flow_time, ), daemon=True)
-            thread_list.append(soil_sensors_thread)
-        flow_button = threading.Thread(target=flow_button, args=(12, timeout), daemon=True)
-        thread_list.append(flow_button)
-        for thread in thread_list:
-            thread.start()
-        for thread in thread_list:
-            thread.join()
+    # while True:
+    thread_list = []
+    light = day_or_night(place="brussels")
+    if light == 1 or debugging == 1:
+        soil_sensors_thread = threading.Thread(
+            target=loop_from_soil_sensors,
+            args=(
+                flow_time,
+            ),
+            daemon=True,
+        )
+        thread_list.append(soil_sensors_thread)
+    flow_button = threading.Thread(
+        target=flow_button,
+        args=(
+            12,
+            timeout,
+        ),
+        daemon=True,
+    )
+
+    thread_list.append(flow_button)
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
 
