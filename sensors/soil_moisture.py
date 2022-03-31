@@ -1,7 +1,7 @@
 import time
 import numpy as np
 
-from libraries import ads1115
+from sensors.libraries import ads1115
 
 
 def get_sensor_voltage(analog_signal):
