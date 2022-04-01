@@ -1,0 +1,16 @@
+[Unit]
+Description=PyWatering Service
+After=multi-user.target
+
+StartLimitIntervalSec=500
+StartLimitBurst=5000
+
+[Service]
+Type=idle
+Restart=on-failure
+RestartSec=30s
+
+ExecStart=/usr/bin/python3 /home/pi/Projects/pywatering/main.py > /home/pi/log/pywatering.log 2>&1
+
+[Install]
+WantedBy=multi-user.target
