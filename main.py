@@ -6,6 +6,8 @@ from gpiozero import Button
 from sensors import relay, soil_moisture
 from libs.light import day_or_night
 from paho.mqtt.client import Client
+from passwd import uname
+from passwd import passwd
 
 
 def on_connect_st(
@@ -84,6 +86,7 @@ def get_mqtt_payload(topic):
         client.on_connect = on_connect_plant4
 
     client.on_message = on_message
+    client.username_pw_set(username=uname, password=passwd)
     client.connect("localhost")
     client.loop_start()
     time.sleep(2)
@@ -109,6 +112,7 @@ def publish_soil_status_mqtt(
 ):
     mqttBroker = "localhost"
     client = Client("Temperature_Inside")
+    client.username_pw_set(username=uname, password=passwd)
     client.connect(mqttBroker)
     moisture_sensor_number = analog_signal + 1
     moisture_sensor_name = "MOISTURE" + str(moisture_sensor_number)
