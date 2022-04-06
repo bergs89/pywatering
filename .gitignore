@@ -1,7 +1,5 @@
 venv
-.idea/misc.xml
-.idea/pywatering.iml
-.idea/pywatering.iml
-.idea/misc.xml
+.idea
 *.xml
 *.iml
+passwd.py
