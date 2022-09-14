@@ -239,7 +239,8 @@ if __name__ == '__main__':
     plant3_toggle = int(get_mqtt_payload("PLANT3"))
     plant4_toggle = int(get_mqtt_payload("PLANT4",))
     print(light)
-    if (light == 1 and int(system_toggle) == 1) or debugging == 1:
+    if (#light == 1 and 
+        int(system_toggle) == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(
             target=loop_from_soil_sensors,
             args=(
