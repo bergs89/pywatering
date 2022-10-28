@@ -116,8 +116,8 @@ def publish_soil_status_mqtt(
     client.connect(mqttBroker)
     moisture_sensor_number = analog_signal + 1
     moisture_sensor_name = "MOISTURE" + str(moisture_sensor_number)
-    if soil_wet == 1:
-        payload = "WET SOIL"
+    if soil_wet > 0:
+        payload = str(soil_wet) + r"%"
     elif soil_wet == 0:
         payload = "DRY SOIL"
     client.publish(moisture_sensor_name, payload)
@@ -231,14 +231,14 @@ if __name__ == '__main__':
     set_relays_off()
     # while True:
     thread_list = []
-    light = day_or_night(place="brussels")
+    # light = day_or_night(place="brussels")
 
     system_toggle = int(get_mqtt_payload("PYWATERING",))
     plant1_toggle = int(get_mqtt_payload("PLANT1",))
     plant2_toggle = int(get_mqtt_payload("PLANT2",))
     plant3_toggle = int(get_mqtt_payload("PLANT3"))
     plant4_toggle = int(get_mqtt_payload("PLANT4",))
-    print(light)
+    # print(light)
     if (#light == 1 and 
         int(system_toggle) == 1) or debugging == 1:
         soil_sensors_thread = threading.Thread(

@@ -18,6 +18,7 @@ def get_moisture(analog_signal):
     if voltage < threshold and voltage > min_v:
         soil_moisture = 1 #soil is wet
         print("Sensor number: " + str(analog_signal) + " says that the soil is wet.")
+        soil_moisture = round(((max_v - voltage) / (max_v - min_v) * 100))
     elif voltage > threshold and voltage < max_v:
         soil_moisture = 0 #soil is not wet
         print("Sensor number: " + str(analog_signal) + " says that the soil is dry.")
@@ -36,17 +37,18 @@ def get_moisture(analog_signal):
 def calibration(analog_signal):
     if analog_signal == 0:
         min_v = 1.29
-        max_v = 2.7
+        max_v = 2.8
     elif analog_signal == 1:
-        min_v = 1.18
-        max_v = 2.7
+        min_v = 0.95
+        max_v = 2.95
     elif analog_signal == 2:
-        min_v = 1.27
-        max_v = 2.78
+        min_v = 0.32
+        max_v = 2.85
     elif analog_signal == 3:
         min_v = 1.35
         max_v = 2.81
-    threshold = (max_v - min_v) * 0.666 + min_v
+    threshold_calibration_constant = 0.85
+    threshold = (max_v - min_v) * threshold_calibration_constant + min_v
     return min_v, max_v, threshold
 
 

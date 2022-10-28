@@ -65,3 +65,4 @@ if __name__ == "__main__":
             voltage = get_analog_voltage(SCL_pin, SDA_pin, analog_signal, gain) 
             print("Voltage on pin: " + str(analog_signal) + " is: " +str(voltage))
             time.sleep(.1)
+        time.sleep(3)
