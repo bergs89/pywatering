@@ -10,6 +10,9 @@ from passwd import uname
 from passwd import passwd
 
 
+global_message = "0"
+
+
 def on_connect_st(
         client,
         userdata,
@@ -71,7 +74,7 @@ def on_message(
 
 
 def get_mqtt_payload(topic):
-    mqttBroker = "localhost"
+    mqttBroker = "192.168.129.26"
     client = Client("Temperature_Inside")
 
     if topic == "PYWATERING":
@@ -87,7 +90,7 @@ def get_mqtt_payload(topic):
 
     client.on_message = on_message
     client.username_pw_set(username=uname, password=passwd)
-    client.connect("localhost")
+    client.connect(mqttBroker)
     client.loop_start()
     time.sleep(2)
     client.loop_stop()
@@ -110,7 +113,7 @@ def publish_soil_status_mqtt(
         analog_signal,
         soil_wet,
 ):
-    mqttBroker = "localhost"
+    mqttBroker = "192.168.129.26"
     client = Client("Temperature_Inside")
     client.username_pw_set(username=uname, password=passwd)
     client.connect(mqttBroker)
