@@ -9,6 +9,7 @@ import sys
 import time
 import gpiozero
 
+
 def relay(relay_channel):
     relay = gpiozero.OutputDevice(relay_channel, active_high=False, initial_value=False)
     return relay
